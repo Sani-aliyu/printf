@@ -1,18 +1,15 @@
 #include "main.h"
-#include <unistd.h>
 
 /**
- * _printf - Custom printf function with limited functionality
- * @format: Format string with conversion specifiers
- * @...: Additional arguments based on the conversion specifiers
+ * _printf - Produces output according to a format
+ * @format: The format string containing directives
  *
- * Return: Number of characters printed (excluding null byte)
+ * Return: The number of characters printed (excluding the null byte)
  */
 int _printf(const char *format, ...)
 {
     va_list args;
     int count = 0;
-    char c;
 
     va_start(args, format);
 
@@ -20,35 +17,25 @@ int _printf(const char *format, ...)
     {
         if (*format == '%')
         {
-            format++;
-            switch (*format)
-            {
-                case 'c':
-                    c = va_arg(args, int);
-                    write(1, &c, 1);
-                    count++;
-                    break;
-                case 's':
-                    count += write(1, va_arg(args, char *), 0);
-                    break;
-                case '%':
-                    write(1, "%", 1);
-                    count++;
-                    break;
-                default:
-                    write(1, "%", 1);
-                    write(1, format, 1);
-                    count += 2;
-                    break;
-            }
+            format++; /* Move past '%' */
+
+            /* Check for valid conversion specifier */
+            if (*format == 'c')
+                count += _putchar(va_arg(args, int));
+            else if (*format == 's')
+                count += _puts(va_arg(args, char *));
+            else if (*format == '%')
+                count += _putchar('%');
+            else
+                return -1; /* Invalid conversion specifier */
+
+            format++; /* Move past the conversion specifier */
         }
         else
         {
-            write(1, format, 1);
-            count++;
+            count += _putchar(*format);
+            format++;
         }
-
-        format++;
     }
 
     va_end(args);
